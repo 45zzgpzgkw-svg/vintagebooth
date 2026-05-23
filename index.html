@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VINTAGE BOOTH ✦ 네컷사진</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+  :root {
+    --green-dark: #2d3a2e;
+    --green-mid: #4a6741;
+    --green-light: #7a9e6e;
+    --green-pale: #b8d4a8;
+    --green-cream: #e8f0e0;
+    --cream: #f5f0e8;
+    --brown: #8b6f47;
+    --gold: #c9a84c;
+    --text-dark: #1a2018;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--green-dark);
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(74,103,65,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(45,58,46,0.6) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%232d3a2e'/%3E%3Crect x='0' y='0' width='1' height='1' fill='%23354035' opacity='0.5'/%3E%3C/svg%3E");
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--cream);
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  .header {
+    text-align: center;
+    padding: 32px 20px 16px;
+    position: relative;
+  }
+  .header::after {
+    content: '✦ ✦ ✦';
+    display: block;
+    color: var(--green-light);
+    font-size: 12px;
+    letter-spacing: 8px;
+    margin-top: 8px;
+  }
+  .logo {
+    font-family: 'Special Elite', cursive;
+    font-size: clamp(28px, 5vw, 48px);
+    color: var(--green-pale);
+    letter-spacing: 6px;
+    text-shadow: 2px 2px 0 var(--green-dark), 0 0 30px rgba(184,212,168,0.3);
+    line-height: 1;
+  }
+  .logo-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--green-light);
+    letter-spacing: 3px;
+    margin-top: 4px;
+  }
+
+  .main-layout {
+    display: flex;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ─── CAMERA PANEL ─── */
+  .camera-panel {
+    flex: 0 0 auto;
+    width: min(460px, 100%);
+  }
+
+  .camera-frame {
+    background: var(--green-mid);
+    border: 3px solid var(--green-light);
+    border-radius: 4px;
+    padding: 16px;
+    box-shadow:
+      0 0 0 1px var(--green-dark),
+      inset 0 0 20px rgba(0,0,0,0.3),
+      0 8px 32px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .camera-frame::before {
+    content: 'VINTAGE BOOTH';
+    position: absolute;
+    top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--green-mid);
+    border: 1px solid var(--green-light);
+    padding: 2px 12px;
+    font-family: 'Special Elite', cursive;
+    font-size: 11px;
+    color: var(--green-pale);
+    letter-spacing: 3px;
+    white-space: nowrap;
+  }
+
+  .viewfinder-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background: #000;
+    overflow: hidden;
+    border: 2px solid var(--green-dark);
+  }
+
+  #videoEl {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    display: block;
+  }
+
+  /* Vintage vignette on viewfinder */
+  .viewfinder-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Scanlines */
+  .scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.06) 3px,
+      rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* Filter canvas overlay */
+  #filterCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    display: none;
+  }
+
+  /* Countdown overlay */
+  .countdown-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .countdown-overlay.visible { opacity: 1; }
+  .countdown-num {
+    font-family: 'Special Elite', cursive;
+    font-size: 100px;
+    color: white;
+    text-shadow: 0 0 40px rgba(255,255,255,0.8), 0 2px 8px rgba(0,0,0,0.5);
+    animation: pulse 1s ease-in-out;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1.4); opacity: 0; }
+    30% { transform: scale(1); opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Flash */
+  .flash-overlay {
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 20;
+    transition: opacity 0.05s;
+  }
+  .flash-overlay.active { opacity: 0.9; }
+
+  /* Shot indicator */
+  .shot-indicator {
+    position: absolute;
+    top: 10px; right: 10px;
+    display: flex; gap: 6px;
+    z-index: 5;
+  }
+  .shot-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    transition: all 0.3s;
+  }
+  .shot-dot.done { background: var(--green-pale); box-shadow: 0 0 8px var(--green-pale); }
+  .shot-dot.active { background: white; box-shadow: 0 0 10px white; animation: blink 0.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Controls */
+  .controls {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mode-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--green-light);
+    background: transparent;
+    color: var(--green-pale);
+    font-family: 'Special Elite', cursive;
+    font-size: 13px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .mode-btn:hover { background: rgba(122,158,110,0.2); }
+  .mode-btn.active {
+    background: var(--green-light);
+    color: var(--green-dark);
+    border-color: var(--green-pale);
+    box-shadow: 0 0 12px rgba(122,158,110,0.4);
+  }
+
+  .shutter-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--green-pale);
+    border: none;
+    border-radius: 2px;
+    font-family: 'Special Elite', cursive;
+    font-size: 18px;
+    letter-spacing: 4px;
+    color: var(--green-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 0 var(--green-mid), 0 6px 12px rgba(0,0,0,0.3);
+    text-transform: uppercase;
+    position: relative;
+  }
+  .shutter-btn:hover {
+    background: var(--cream);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 var(--green-mid), 0 8px 16px rgba(0,0,0,0.3);
+  }
+  .shutter-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--green-mid), 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .shutter-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .sec-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--green-light);
+    background: transparent;
+    color: var(--green-light);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+  .sec-btn:hover { background: rgba(122,158,110,0.15); color: var(--green-pale); }
+  .sec-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .status-bar {
+    text-align: center;
+    font-family: 'Special Elite', cursive;
+    font-size: 12px;
+    color: var(--green-light);
+    letter-spacing: 2px;
+    min-height: 20px;
+    margin-top: 4px;
+  }
+
+  /* ─── STRIP PANEL ─── */
+  .strip-panel {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .photo-strip-wrap {
+    position: relative;
+  }
+
+  /* The actual film strip */
+  .photo-strip {
+    width: 200px;
+    background: var(--green-mid);
+    border: 4px solid var(--green-dark);
+    padding: 16px 12px;
+    box-shadow:
+      0 0 0 2px var(--green-light),
+      0 0 0 6px var(--green-mid),
+      0 0 0 8px var(--green-light),
+      0 20px 60px rgba(0,0,0,0.6);
+    position: relative;
+  }
+
+  /* Film holes */
+  .film-holes {
+    position: absolute;
+    top: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 12px 0;
+    z-index: 1;
+  }
+  .film-holes.left { left: -3px; }
+  .film-holes.right { right: -3px; }
+  .film-hole {
+    width: 8px; height: 8px;
+    background: var(--green-dark);
+    border-radius: 1px;
+    border: 1px solid var(--green-light);
+    opacity: 0.6;
+  }
+
+  .strip-label {
+    font-family: 'Special Elite', cursive;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--green-light);
+    text-align: center;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+
+  .strip-photos {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .strip-slot {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--green-dark);
+    border: 1px solid rgba(122,158,110,0.3);
+    overflow: hidden;
+    position: relative;
+  }
+  .strip-slot canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .strip-slot .empty-slot {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(122,158,110,0.3);
+    font-family: 'Special Elite', cursive;
+    font-size: 28px;
+  }
+
+  .strip-date {
+    font-family: 'Special Elite', cursive;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--green-light);
+    text-align: center;
+    margin-top: 8px;
+    opacity: 0.6;
+  }
+
+  /* Strip action buttons */
+  .strip-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 200px;
+  }
+
+  .dl-btn {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--green-light);
+    background: var(--green-dark);
+    color: var(--green-pale);
+    font-family: 'Special Elite', cursive;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+  .dl-btn:hover:not(:disabled) { background: var(--green-mid); border-color: var(--green-pale); }
+  .dl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .retake-btn {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(122,158,110,0.4);
+    background: transparent;
+    color: var(--green-light);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .retake-btn:hover { border-color: var(--green-light); color: var(--green-pale); }
+
+  /* Recording indicator */
+  .rec-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,80,80,0.6);
+    border-radius: 2px;
+    padding: 3px 8px;
+    font-family: 'Special Elite', cursive;
+    font-size: 10px;
+    color: #ff6060;
+    letter-spacing: 2px;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .rec-badge.active { opacity: 1; }
+  .rec-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #ff4040;
+    animation: rec-pulse 1s infinite;
+  }
+  @keyframes rec-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  /* Decorative corner marks */
+  .corner { position: absolute; width: 16px; height: 16px; }
+  .corner-tl { top: 6px; left: 6px; border-top: 2px solid var(--green-pale); border-left: 2px solid var(--green-pale); }
+  .corner-tr { top: 6px; right: 6px; border-top: 2px solid var(--green-pale); border-right: 2px solid var(--green-pale); }
+  .corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid var(--green-pale); border-left: 2px solid var(--green-pale); }
+  .corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid var(--green-pale); border-right: 2px solid var(--green-pale); }
+
+  /* Camera permission prompt */
+  .permission-screen {
+    position: absolute;
+    inset: 0;
+    background: #0a120a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 50;
+    cursor: pointer;
+  }
+  .permission-screen p {
+    font-family: 'Special Elite', cursive;
+    font-size: 14px;
+    color: var(--green-light);
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 0 20px;
+  }
+  .cam-icon {
+    font-size: 48px;
+    filter: grayscale(1) opacity(0.5);
+  }
+
+  /* Notification toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--green-mid);
+    border: 1px solid var(--green-light);
+    color: var(--green-pale);
+    font-family: 'Special Elite', cursive;
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 12px 24px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 1000;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">VINTAGE BOOTH</div>
+  <div class="logo-sub">네컷 포토부스 · NEW YORK STYLE</div>
+</div>
+
+<div class="main-layout">
+
+  <!-- CAMERA PANEL -->
+  <div class="camera-panel">
+    <div class="camera-frame">
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <div class="viewfinder-wrap" id="viewfinder">
+        <video id="videoEl" autoplay playsinline muted></video>
+        <canvas id="filterCanvas"></canvas>
+        <div class="scanlines"></div>
+
+        <!-- Shot dots -->
+        <div class="shot-indicator">
+          <div class="shot-dot" id="dot0"></div>
+          <div class="shot-dot" id="dot1"></div>
+          <div class="shot-dot" id="dot2"></div>
+          <div class="shot-dot" id="dot3"></div>
+        </div>
+
+        <!-- REC badge -->
+        <div class="rec-badge" id="recBadge">
+          <div class="rec-dot"></div>REC
+        </div>
+
+        <!-- Countdown -->
+        <div class="countdown-overlay" id="countdownOverlay">
+          <div class="countdown-num" id="countdownNum">3</div>
+        </div>
+
+        <!-- Flash -->
+        <div class="flash-overlay" id="flashOverlay"></div>
+
+        <!-- Permission screen -->
+        <div class="permission-screen" id="permScreen">
+          <div class="cam-icon" id="permIcon">📷</div>
+          <p id="permTitle">카메라 권한 요청 중...</p>
+          <p style="font-size:11px; opacity:0.5;" id="permSub">브라우저 팝업에서 허용을 눌러주세요</p>
+          <button id="retryBtn" onclick="startCamera()" style="display:none; margin-top:14px; padding:10px 28px; background:transparent; border:2px solid #7a9e6e; color:#b8d4a8; font-family:'Special Elite',cursive; font-size:13px; letter-spacing:2px; cursor:pointer; border-radius:2px; transition:all 0.2s;">↺ 다시 시도</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <!-- Color mode -->
+        <div class="mode-row">
+          <button class="mode-btn active" id="btnColor" onclick="setMode('color')">🎨 컬러</button>
+          <button class="mode-btn" id="btnBW" onclick="setMode('bw')">◐ 흑백</button>
+        </div>
+
+        <!-- Shutter -->
+        <button class="shutter-btn" id="shutterBtn" onclick="startShooting()" disabled>
+          📸 촬영 시작
+        </button>
+
+        <!-- Secondary -->
+        <div class="btn-row">
+          <button class="sec-btn" id="videoToggleBtn" onclick="toggleVideoRecord()" disabled>⏺ 영상 녹화</button>
+          <button class="sec-btn" onclick="resetAll()">↺ 다시 시작</button>
+        </div>
+
+        <div class="status-bar" id="statusBar">카메라를 열어 시작하세요</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRIP PANEL -->
+  <div class="strip-panel">
+    <div class="photo-strip-wrap">
+      <div class="photo-strip" id="photoStrip">
+        <!-- Film holes left -->
+        <div class="film-holes left">
+          <div class="film-hole"></div><div class="film-hole"></div>
+          <div class="film-hole"></div><div class="film-hole"></div>
+          <div class="film-hole"></div><div class="film-hole"></div>
+          <div class="film-hole"></div><div class="film-hole"></div>
+        </div>
+        <!-- Film holes right -->
+        <div class="film-holes right">
+          <div class="film-hole"></div><div class="film-hole"></div>
+          <div class="film-hole"></div><div class="film-hole"></div>
+          <div class="film-hole"></div><div class="film-hole"></div>
+          <div class="film-hole"></div><div class="film-hole"></div>
+        </div>
+
+        <div class="strip-label">VINTAGE · BOOTH · NO.1</div>
+        <div class="strip-photos" id="stripPhotos">
+          <div class="strip-slot" id="slot0"><div class="empty-slot">①</div></div>
+          <div class="strip-slot" id="slot1"><div class="empty-slot">②</div></div>
+          <div class="strip-slot" id="slot2"><div class="empty-slot">③</div></div>
+          <div class="strip-slot" id="slot3"><div class="empty-slot">④</div></div>
+        </div>
+        <div class="strip-date" id="stripDate"></div>
+      </div>
+    </div>
+
+    <div class="strip-actions">
+      <button class="dl-btn" id="dlPhotoBtn" onclick="downloadStrip()" disabled>⬇ 사진 저장</button>
+      <button class="dl-btn" id="dlVideoBtn" onclick="downloadVideo()" disabled>⬇ 영상 저장</button>
+      <button class="retake-btn" onclick="resetAll()">처음부터 다시 찍기</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Hidden canvas for capture -->
+<canvas id="captureCanvas" style="display:none"></canvas>
+<canvas id="stripCanvas" style="display:none"></canvas>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let stream = null;
+let mode = 'color'; // 'color' | 'bw'
+let shotCount = 0;
+let isShooting = false;
+let capturedImages = []; // ImageData for each shot
+let mediaRecorder = null;
+let recordedChunks = [];
+let isRecording = false;
+let rafId = null;
+
+const video = document.getElementById('videoEl');
+const filterCanvas = document.getElementById('filterCanvas');
+const ctx = filterCanvas.getContext('2d');
+const captureCanvas = document.getElementById('captureCanvas');
+const captureCtx = captureCanvas.getContext('2d');
+
+// ── Camera start ───────────────────────────────────────────────────────────
+async function startCamera() {
+  // Reset to "requesting" state
+  document.getElementById('permIcon').textContent = '⏳';
+  document.getElementById('permTitle').textContent = '카메라 권한 요청 중...';
+  document.getElementById('permSub').textContent = '브라우저 팝업에서 허용을 눌러주세요';
+  document.getElementById('retryBtn').style.display = 'none';
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    });
+    video.srcObject = stream;
+    await video.play();
+    document.getElementById('permScreen').style.display = 'none';
+    document.getElementById('shutterBtn').disabled = false;
+    document.getElementById('videoToggleBtn').disabled = false;
+    document.getElementById('statusBar').textContent = '촬영 버튼을 눌러 시작하세요';
+
+    // Start live filter rendering
+    filterCanvas.style.display = 'block';
+    renderLiveFilter();
+
+    // Set date
+    const now = new Date();
+    document.getElementById('stripDate').textContent =
+      `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+  } catch(e) {
+    // Show retry button on failure
+    document.getElementById('permIcon').textContent = '🚫';
+    document.getElementById('permTitle').textContent = '카메라 접근이 거부됐어요';
+    document.getElementById('permSub').textContent = '아래 버튼을 눌러 다시 시도하세요';
+    document.getElementById('retryBtn').style.display = 'inline-block';
+    document.getElementById('statusBar').textContent = '카메라 허용 후 다시 시도하세요';
+  }
+}
+
+// ── Auto-request camera on page load ──────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  startCamera();
+});
+
+// ── Live filter render loop ────────────────────────────────────────────────
+function renderLiveFilter() {
+  const vw = video.videoWidth || 640;
+  const vh = video.videoHeight || 480;
+
+  // Make canvas square (crop center)
+  const size = Math.min(vw, vh);
+  filterCanvas.width = size;
+  filterCanvas.height = size;
+
+  const sx = (vw - size) / 2;
+  const sy = (vh - size) / 2;
+
+  // Flip horizontally (mirror)
+  ctx.save();
+  ctx.translate(size, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, sx, sy, size, size, 0, 0, size, size);
+  ctx.restore();
+
+  applyVintageFilter(ctx, size, size, mode);
+  rafId = requestAnimationFrame(renderLiveFilter);
+}
+
+// ── Vintage NY photobooth filter ───────────────────────────────────────────
+function applyVintageFilter(context, w, h, colorMode) {
+  const imageData = context.getImageData(0, 0, w, h);
+  const d = imageData.data;
+
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i], g = d[i+1], b = d[i+2];
+
+    // Fade blacks (lift shadows) — NY photobooth characteristic
+    r = Math.min(255, r * 0.85 + 18);
+    g = Math.min(255, g * 0.82 + 16);
+    b = Math.min(255, b * 0.78 + 22);
+
+    if (colorMode === 'bw') {
+      // Slightly warm BW — classic photobooth
+      const lum = r * 0.299 + g * 0.587 + b * 0.114;
+      r = Math.min(255, lum * 1.02 + 10);
+      g = Math.min(255, lum * 0.99 + 8);
+      b = Math.min(255, lum * 0.92 + 6);
+    } else {
+      // Green-teal cast + faded highlights — vintage color
+      r = Math.min(255, r * 0.93 + 5);
+      g = Math.min(255, g * 1.03 + 4);
+      b = Math.min(255, b * 0.97 + 8);
+    }
+
+    // Slight contrast boost
+    r = clamp(((r / 255 - 0.5) * 1.12 + 0.5) * 255);
+    g = clamp(((g / 255 - 0.5) * 1.10 + 0.5) * 255);
+    b = clamp(((b / 255 - 0.5) * 1.10 + 0.5) * 255);
+
+    d[i] = r; d[i+1] = g; d[i+2] = b;
+  }
+  context.putImageData(imageData, 0, 0);
+
+  // Vignette
+  const grad = context.createRadialGradient(w/2, h/2, h*0.28, w/2, h/2, h*0.75);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, colorMode === 'bw' ? 'rgba(0,0,0,0.5)' : 'rgba(10,18,10,0.52)');
+  context.fillStyle = grad;
+  context.fillRect(0, 0, w, h);
+
+  // Green tint overlay for color mode
+  if (colorMode === 'color') {
+    context.fillStyle = 'rgba(40,70,32,0.07)';
+    context.fillRect(0, 0, w, h);
+  }
+
+  // Film scratch lines
+  if (Math.random() < 0.15) {
+    context.strokeStyle = colorMode === 'bw' ? 'rgba(255,255,255,0.04)' : 'rgba(180,220,160,0.04)';
+    context.lineWidth = 1;
+    const x = Math.random() * w;
+    context.beginPath();
+    context.moveTo(x, 0);
+    context.lineTo(x + (Math.random()-0.5)*20, h);
+    context.stroke();
+  }
+}
+
+function clamp(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+// ── Capture single frame ───────────────────────────────────────────────────
+function captureFrame() {
+  // Use the live filtered canvas content
+  const size = filterCanvas.width;
+  captureCanvas.width = size;
+  captureCanvas.height = size;
+  captureCtx.drawImage(filterCanvas, 0, 0);
+  return captureCtx.toDataURL('image/jpeg', 0.92);
+}
+
+// ── Shooting sequence ──────────────────────────────────────────────────────
+async function startShooting() {
+  if (isShooting || !stream) return;
+  if (shotCount >= 4) { resetPhotos(); }
+
+  isShooting = true;
+  document.getElementById('shutterBtn').disabled = true;
+  document.getElementById('statusBar').textContent = '';
+
+  await shootOne();
+}
+
+async function shootOne() {
+  if (shotCount >= 4) {
+    finishShooting();
+    return;
+  }
+
+  // Update dot
+  updateDots('active', shotCount);
+
+  // Countdown 3-2-1
+  for (let n = 3; n >= 1; n--) {
+    await countdown(n);
+  }
+
+  // Flash
+  await flash();
+
+  // Capture
+  const dataUrl = captureFrame();
+  capturedImages[shotCount] = dataUrl;
+  displayInStrip(shotCount, dataUrl);
+  updateDots('done', shotCount);
+  shotCount++;
+
+  document.getElementById('statusBar').textContent =
+    shotCount < 4 ? `${shotCount}/4 완료 — 다음 촬영 준비...` : '4/4 완료!';
+
+  if (shotCount < 4) {
+    await sleep(700);
+    await shootOne();
+  } else {
+    finishShooting();
+  }
+}
+
+function finishShooting() {
+  isShooting = false;
+  document.getElementById('shutterBtn').disabled = false;
+  document.getElementById('shutterBtn').textContent = '📸 다시 찍기';
+  document.getElementById('dlPhotoBtn').disabled = false;
+  document.getElementById('statusBar').textContent = '완성! 사진을 저장하세요 ✦';
+  showToast('네컷 완성! 사진을 저장해보세요 ✦');
+}
+
+// ── Countdown ──────────────────────────────────────────────────────────────
+function countdown(n) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('countdownOverlay');
+    const num = document.getElementById('countdownNum');
+    num.textContent = n;
+    num.style.animation = 'none';
+    void num.offsetWidth; // reflow
+    num.style.animation = 'pulse 1s ease-in-out forwards';
+    overlay.classList.add('visible');
+    setTimeout(() => {
+      overlay.classList.remove('visible');
+      resolve();
+    }, 900);
+  });
+}
+
+// ── Flash ──────────────────────────────────────────────────────────────────
+function flash() {
+  return new Promise(resolve => {
+    const fl = document.getElementById('flashOverlay');
+    fl.classList.add('active');
+    setTimeout(() => { fl.classList.remove('active'); resolve(); }, 200);
+  });
+}
+
+// ── Display in strip ───────────────────────────────────────────────────────
+function displayInStrip(idx, dataUrl) {
+  const slot = document.getElementById(`slot${idx}`);
+  slot.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+  slot.appendChild(img);
+}
+
+// ── Dot indicators ────────────────────────────────────────────────────────
+function updateDots(state, idx) {
+  const dot = document.getElementById(`dot${idx}`);
+  dot.className = 'shot-dot ' + state;
+}
+
+// ── Mode toggle ────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnColor').classList.toggle('active', m === 'color');
+  document.getElementById('btnBW').classList.toggle('active', m === 'bw');
+}
+
+// ── Reset ──────────────────────────────────────────────────────────────────
+function resetPhotos() {
+  shotCount = 0;
+  capturedImages = [];
+  for (let i = 0; i < 4; i++) {
+    document.getElementById(`slot${i}`).innerHTML = `<div class="empty-slot">${['①','②','③','④'][i]}</div>`;
+    document.getElementById(`dot${i}`).className = 'shot-dot';
+  }
+  document.getElementById('dlPhotoBtn').disabled = true;
+}
+
+function resetAll() {
+  if (isRecording) stopVideoRecord();
+  resetPhotos();
+  document.getElementById('shutterBtn').textContent = '📸 촬영 시작';
+  document.getElementById('shutterBtn').disabled = !stream;
+  document.getElementById('dlVideoBtn').disabled = true;
+  document.getElementById('statusBar').textContent = stream ? '촬영 버튼을 눌러 시작하세요' : '카메라를 열어 시작하세요';
+  recordedChunks = [];
+}
+
+// ── Download strip as image ────────────────────────────────────────────────
+async function downloadStrip() {
+  if (capturedImages.length < 4) return;
+
+  // Render the full strip onto a canvas
+  const slotSize = 400;
+  const gap = 16;
+  const padX = 48;
+  const padTop = 70;
+  const padBot = 50;
+  const totalW = slotSize + padX * 2;
+  const totalH = slotSize * 4 + gap * 3 + padTop + padBot;
+
+  const sc = document.getElementById('stripCanvas');
+  sc.width = totalW;
+  sc.height = totalH;
+  const sCtx = sc.getContext('2d');
+
+  // Background — vintage green
+  sCtx.fillStyle = '#4a6741';
+  sCtx.fillRect(0, 0, totalW, totalH);
+
+  // Outer border
+  sCtx.strokeStyle = '#7a9e6e';
+  sCtx.lineWidth = 6;
+  sCtx.strokeRect(3, 3, totalW - 6, totalH - 6);
+  sCtx.strokeStyle = '#2d3a2e';
+  sCtx.lineWidth = 2;
+  sCtx.strokeRect(10, 10, totalW - 20, totalH - 20);
+
+  // Film holes
+  sCtx.fillStyle = '#2d3a2e';
+  for (let i = 0; i < 8; i++) {
+    const y = padTop + (totalH - padTop - padBot) * (i / 7);
+    sCtx.fillRect(6, y - 5, 12, 10);
+    sCtx.fillRect(totalW - 18, y - 5, 12, 10);
+  }
+
+  // Label
+  sCtx.fillStyle = '#7a9e6e';
+  sCtx.font = `bold 16px "Special Elite", cursive`;
+  sCtx.textAlign = 'center';
+  sCtx.letterSpacing = '4px';
+  sCtx.fillText('VINTAGE · BOOTH · NO.1', totalW / 2, padTop * 0.55);
+
+  // Load and draw photos
+  for (let i = 0; i < 4; i++) {
+    const img = new Image();
+    await new Promise(r => { img.onload = r; img.src = capturedImages[i]; });
+    const y = padTop + i * (slotSize + gap);
+    // Slot background
+    sCtx.fillStyle = '#1a2018';
+    sCtx.fillRect(padX, y, slotSize, slotSize);
+    sCtx.drawImage(img, padX, y, slotSize, slotSize);
+    // Slot border
+    sCtx.strokeStyle = 'rgba(122,158,110,0.4)';
+    sCtx.lineWidth = 1;
+    sCtx.strokeRect(padX, y, slotSize, slotSize);
+  }
+
+  // Date
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+  sCtx.fillStyle = '#7a9e6e';
+  sCtx.font = '14px "Special Elite", cursive';
+  sCtx.textAlign = 'center';
+  sCtx.fillText(dateStr, totalW / 2, totalH - 20);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = `vintage-booth-${Date.now()}.jpg`;
+  link.href = sc.toDataURL('image/jpeg', 0.95);
+  link.click();
+  showToast('사진이 저장되었습니다! ✦');
+}
+
+// ── Video recording ────────────────────────────────────────────────────────
+function toggleVideoRecord() {
+  if (isRecording) stopVideoRecord();
+  else startVideoRecord();
+}
+
+function startVideoRecord() {
+  if (!stream) return;
+  recordedChunks = [];
+
+  // Record from filterCanvas + audio (no audio since camera has no audio)
+  const canvasStream = filterCanvas.captureStream(30);
+
+  try {
+    mediaRecorder = new MediaRecorder(canvasStream, {
+      mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm'
+    });
+  } catch(e) {
+    mediaRecorder = new MediaRecorder(canvasStream);
+  }
+
+  mediaRecorder.ondataavailable = e => {
+    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+  };
+  mediaRecorder.onstop = () => {
+    document.getElementById('dlVideoBtn').disabled = false;
+  };
+
+  mediaRecorder.start(100);
+  isRecording = true;
+  document.getElementById('recBadge').classList.add('active');
+  document.getElementById('videoToggleBtn').textContent = '⏹ 녹화 중지';
+  showToast('영상 녹화가 시작되었습니다');
+}
+
+function stopVideoRecord() {
+  if (mediaRecorder && isRecording) {
+    mediaRecorder.stop();
+    isRecording = false;
+    document.getElementById('recBadge').classList.remove('active');
+    document.getElementById('videoToggleBtn').textContent = '⏺ 영상 녹화';
+    showToast('녹화 완료! 영상을 저장하세요');
+  }
+}
+
+function downloadVideo() {
+  if (!recordedChunks.length) return;
+  const blob = new Blob(recordedChunks, { type: 'video/webm' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `vintage-booth-${Date.now()}.webm`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('영상이 저장되었습니다! ✦');
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
